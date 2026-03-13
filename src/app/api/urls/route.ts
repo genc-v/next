@@ -1,37 +1,45 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import dbConnect from "@/lib/db";
-import Url from "@/models/Url";
+import User from "@/models/User";
 import { generateShortCode, isValidUrl } from "@/lib/utils";
 
+// GET /api/urls — fetch all URLs for the logged-in user
 export async function GET() {
   try {
     const session = await auth();
-
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     await dbConnect();
 
-    const urls = await Url.find({ userId: session.user.id })
-      .sort({ createdAt: -1 })
-      .lean();
+    const user = await User.findById(session.user.id);
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    // Return the URLs sorted by creation date (newest first)
+    const urls = [...user.links].sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateB - dateA;
+    });
 
     return NextResponse.json({ urls });
   } catch (error) {
     console.error("Error fetching URLs:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Internal Server Error" },
       { status: 500 }
     );
   }
 }
 
-export async function POST(req: NextRequest) {
+// POST /api/urls — create a new shortened URL
+export async function POST(req: Request) {
   try {
     const session = await auth();
-
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -47,29 +55,41 @@ export async function POST(req: NextRequest) {
 
     await dbConnect();
 
-    // Generate unique short code
-    let code: string;
+    // Generate a unique 6-character code
+    let code = "";
     let exists = true;
-
-    do {
+    while (exists) {
       code = generateShortCode();
-      exists = !!(await Url.findOne({ code }));
-    } while (exists);
+      const userWithCode = await User.findOne({ "links.code": code });
+      exists = !!userWithCode;
+    }
 
-    const newUrl = await Url.create({
+    const newLink = {
       code,
       originalUrl: url,
-      userId: session.user.id,
-    });
+    };
+
+    const user = await User.findByIdAndUpdate(
+      session.user.id,
+      {
+        $push: { links: newLink }
+      },
+      { new: true }
+    );
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    const createdLink = user.links.find((l) => l.code === code);
 
     return NextResponse.json(
       {
         url: {
-          id: newUrl._id.toString(),
-          code: newUrl.code,
-          originalUrl: newUrl.originalUrl,
-          shortUrl: `${process.env.NEXT_PUBLIC_APP_URL}/${newUrl.code}`,
-          createdAt: newUrl.createdAt,
+          code: createdLink?.code,
+          originalUrl: createdLink?.originalUrl,
+          shortUrl: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/${createdLink?.code}`,
+          createdAt: createdLink?.createdAt,
         },
       },
       { status: 201 }
@@ -77,35 +97,37 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("Error creating URL:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Internal Server Error" },
       { status: 500 }
     );
   }
 }
 
-export async function DELETE(req: NextRequest) {
+// DELETE /api/urls?code=xxx — delete a specific URL by code for the logged-in user
+export async function DELETE(req: Request) {
   try {
     const session = await auth();
-
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
-    const id = searchParams.get("id");
+    // Changing to delete by code because we removed ids
+    const code = searchParams.get("code") || searchParams.get("id");
 
-    if (!id) {
-      return NextResponse.json({ error: "URL ID is required" }, { status: 400 });
+    if (!code) {
+      return NextResponse.json({ error: "URL code is required" }, { status: 400 });
     }
 
     await dbConnect();
 
-    const url = await Url.findOneAndDelete({
-      _id: id,
-      userId: session.user.id,
-    });
+    const user = await User.findOneAndUpdate(
+      { _id: session.user.id, "links.code": code },
+      { $pull: { links: { code } } },
+      { new: true }
+    );
 
-    if (!url) {
+    if (!user) {
       return NextResponse.json({ error: "URL not found" }, { status: 404 });
     }
 
@@ -113,7 +135,7 @@ export async function DELETE(req: NextRequest) {
   } catch (error) {
     console.error("Error deleting URL:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Internal Server Error" },
       { status: 500 }
     );
   }
