@@ -2,6 +2,13 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 
 export type UserRole = "user" | "admin";
 
+export interface ILink {
+  code: string;
+  originalUrl: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface IUser extends Document {
   _id: mongoose.Types.ObjectId;
   name: string;
@@ -9,9 +16,29 @@ export interface IUser extends Document {
   hashedPassword?: string;
   image?: string;
   role: UserRole;
+  links: ILink[];
   createdAt: Date;
   updatedAt: Date;
 }
+
+const LinkSchema = new Schema<ILink>(
+  {
+    code: {
+      type: String,
+      required: true,
+      unique: true,
+      index: true,
+    },
+    originalUrl: {
+      type: String,
+      required: true,
+    },
+  },
+  {
+    timestamps: true,
+    _id: false, // Don't create separate ObjectIds for each link
+  }
+);
 
 const UserSchema = new Schema<IUser>(
   {
@@ -37,6 +64,10 @@ const UserSchema = new Schema<IUser>(
       type: String,
       enum: ["user", "admin"],
       default: "user",
+    },
+    links: {
+      type: [LinkSchema],
+      default: [],
     },
   },
   {

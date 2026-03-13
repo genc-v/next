@@ -1,82 +1,77 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import dbConnect from "@/lib/db";
-import Url from "@/models/Url";
 import User from "@/models/User";
 
 // GET /api/admin/urls?search=&page=1&limit=10
-export async function GET(req: NextRequest) {
+export async function GET(req: Request) {
   try {
     const session = await auth();
-
-    if (!session?.user?.id || session.user.role !== "admin") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (session?.user?.role !== "admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    const { searchParams } = new URL(req.url);
-    const search = searchParams.get("search")?.trim() || "";
-    const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
-    const limit = Math.min(50, Math.max(1, parseInt(searchParams.get("limit") || "10", 10)));
-    const skip = (page - 1) * limit;
 
     await dbConnect();
 
-    // Ensure User model is registered before populating
-    void User;
+    const { searchParams } = new URL(req.url);
+    const search = searchParams.get("search") || "";
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    const limit = parseInt(searchParams.get("limit") || "10", 10);
+    const skip = (page - 1) * limit;
 
-    // Build filter — search by code, originalUrl, or owner email/name
-    let filter = {};
+    // Use aggregation to unwind links and search through them
+    const pipeline: any[] = [
+      { $unwind: "$links" }
+    ];
 
     if (search) {
-      // First find matching user IDs
-      const matchingUsers = await User.find({
-        $or: [
-          { name: { $regex: search, $options: "i" } },
-          { email: { $regex: search, $options: "i" } },
-        ],
-      })
-        .select("_id")
-        .lean();
-
-      const matchingUserIds = matchingUsers.map((u) => u._id);
-
-      filter = {
-        $or: [
-          { code: { $regex: search, $options: "i" } },
-          { originalUrl: { $regex: search, $options: "i" } },
-          { userId: { $in: matchingUserIds } },
-        ],
-      };
+      pipeline.push({
+        $match: {
+          $or: [
+            { "links.code": { $regex: search, $options: "i" } },
+            { "links.originalUrl": { $regex: search, $options: "i" } },
+            { email: { $regex: search, $options: "i" } },
+            { name: { $regex: search, $options: "i" } },
+          ]
+        }
+      });
     }
 
-    const [urls, total] = await Promise.all([
-      Url.find(filter)
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit)
-        .populate("userId", "name email")
-        .lean(),
-      Url.countDocuments(filter),
-    ]);
+    // Count pipeline
+    const countPipeline = [...pipeline, { $count: "total" }];
+    const countResult = await User.aggregate(countPipeline);
+    const total = countResult.length > 0 ? countResult[0].total : 0;
 
-    const formatted = urls.map((url) => {
-      const owner = url.userId as unknown as
-        | { _id: { toString(): string }; name: string; email: string }
-        | null;
+    // Data pipeline
+    pipeline.push(
+      { $sort: { "links.createdAt": -1 } },
+      { $skip: skip },
+      { $limit: limit },
+      {
+        $project: {
+          _id: 0,
+          userId: "$_id",
+          userName: "$name",
+          userEmail: "$email",
+          code: "$links.code",
+          originalUrl: "$links.originalUrl",
+          createdAt: "$links.createdAt",
+          updatedAt: "$links.updatedAt"
+        }
+      }
+    );
 
-      return {
-        ...url,
-        _id: url._id.toString(),
-        userId:
-          owner && typeof owner === "object" && "email" in owner
-            ? {
-                _id: owner._id.toString(),
-                name: owner.name,
-                email: owner.email,
-              }
-            : url.userId?.toString(),
-      };
-    });
+    const urls = await User.aggregate(pipeline);
+
+    const formatted = urls.map((url) => ({
+      ...url,
+      _id: url.code, // Use code as _id for frontend compatibility
+      userId: {
+        _id: url.userId.toString(),
+        name: url.userName,
+        email: url.userEmail,
+      },
+    }));
 
     return NextResponse.json({
       urls: formatted,
@@ -88,36 +83,39 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     console.error("Admin urls error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Internal Server Error" },
       { status: 500 }
     );
   }
 }
 
-// DELETE /api/admin/urls?id=xxx — delete any URL by ID
-export async function DELETE(req: NextRequest) {
+// DELETE /api/admin/urls?id=xxx — delete any URL by code
+export async function DELETE(req: Request) {
   try {
     const session = await auth();
-
-    if (!session?.user?.id || session.user.role !== "admin") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (session?.user?.role !== "admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
-    const id = searchParams.get("id");
+    const code = searchParams.get("id") || searchParams.get("code");
 
-    if (!id) {
+    if (!code) {
       return NextResponse.json(
-        { error: "URL ID is required" },
+        { error: "URL code is required" },
         { status: 400 }
       );
     }
 
     await dbConnect();
 
-    const url = await Url.findByIdAndDelete(id);
+    const user = await User.findOneAndUpdate(
+      { "links.code": code },
+      { $pull: { links: { code } } },
+      { new: true }
+    );
 
-    if (!url) {
+    if (!user) {
       return NextResponse.json({ error: "URL not found" }, { status: 404 });
     }
 
@@ -125,7 +123,7 @@ export async function DELETE(req: NextRequest) {
   } catch (error) {
     console.error("Admin delete url error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Internal Server Error" },
       { status: 500 }
     );
   }

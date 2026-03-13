@@ -61,7 +61,7 @@ export default function DashboardPage() {
   }
 
   function handleUrlDeleted(id: string) {
-    setUrls((prev) => prev.filter((u) => (u.id || u._id) !== id));
+    setUrls((prev) => prev.filter((u) => (u.id || u._id || u.code) !== id));
   }
 
   return (
