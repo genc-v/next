@@ -3,7 +3,6 @@ import { auth } from "@/lib/auth";
 import dbConnect from "@/lib/db";
 import User from "@/models/User";
 
-// GET /api/admin/users?search=&page=1&limit=10
 export async function GET(req: Request) {
   try {
     const session = await auth();
@@ -37,7 +36,6 @@ export async function GET(req: Request) {
       User.countDocuments(filter),
     ]);
 
-    // Format the users array
     const formattedUsers = users.map((user) => ({
       _id: user._id.toString(),
       name: user.name,

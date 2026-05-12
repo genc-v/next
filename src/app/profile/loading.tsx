@@ -1,14 +1,12 @@
 export default function ProfileLoading() {
   return (
     <div className="mx-auto max-w-3xl animate-pulse space-y-6 pb-12">
-      {/* Header */}
       <div className="rounded-xl border border-gray-200 bg-white p-6 md:p-8">
         <div className="h-3 w-16 rounded bg-gray-200" />
         <div className="mt-2 h-8 w-48 rounded-lg bg-gray-200" />
         <div className="mt-2 h-4 w-80 rounded bg-gray-200" />
       </div>
 
-      {/* Account info */}
       <div className="rounded-xl border border-gray-200 bg-white p-6">
         <div className="mb-4 h-4 w-20 rounded bg-gray-200" />
         <div className="rounded-lg bg-gray-50 p-4 space-y-2">
@@ -19,7 +17,6 @@ export default function ProfileLoading() {
         </div>
       </div>
 
-      {/* Name form */}
       <div className="rounded-xl border border-gray-200 bg-white p-6 space-y-4">
         <div className="h-4 w-28 rounded bg-gray-200" />
         <div>
@@ -29,7 +26,6 @@ export default function ProfileLoading() {
         <div className="h-9 w-28 rounded-md bg-gray-200" />
       </div>
 
-      {/* Password form */}
       <div className="rounded-xl border border-gray-200 bg-white p-6 space-y-4">
         <div className="h-4 w-36 rounded bg-gray-200" />
         <div className="h-4 w-56 rounded bg-gray-200" />

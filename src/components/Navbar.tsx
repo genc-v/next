@@ -13,7 +13,6 @@ export default function Navbar() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
 
-  // Close dropdown on click outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -36,7 +35,6 @@ export default function Navbar() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           
-          {/* Logo */}
           <Link href="/" className="flex items-center gap-2 text-xl font-bold text-gray-900 transition-opacity hover:opacity-80">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-black text-white">
               <LinkIcon size={18} strokeWidth={3} />
@@ -44,7 +42,6 @@ export default function Navbar() {
             Shorty
           </Link>
 
-          {/* Desktop Navigation */}
           <div className="hidden md:flex md:items-center md:gap-6">
             {navLinks.map((link) => (
               <Link
@@ -69,7 +66,6 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* User Actions */}
           <div className="hidden md:flex md:items-center md:gap-4">
             {status === "loading" ? (
               <div className="h-9 w-24 animate-pulse rounded-md bg-gray-200" />
@@ -86,7 +82,6 @@ export default function Navbar() {
                   <ChevronDown size={14} className={`text-gray-400 transition-transform ${isDropdownOpen ? "rotate-180" : ""}`} />
                 </button>
 
-                {/* Dropdown Menu */}
                 {isDropdownOpen && (
                   <div className="absolute right-0 mt-2 w-56 origin-top-right rounded-xl border border-gray-200 bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                     <div className="border-b border-gray-100 px-4 py-3">
@@ -145,7 +140,6 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Mobile menu button */}
           <div className="flex items-center md:hidden">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -158,7 +152,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="border-b border-gray-200 bg-white md:hidden shadow-lg">
           <div className="space-y-1 px-4 pb-3 pt-2">

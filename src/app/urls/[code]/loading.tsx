@@ -1,10 +1,8 @@
 export default function UrlDetailLoading() {
   return (
     <div className="mx-auto max-w-5xl animate-pulse space-y-6">
-      {/* Back link */}
       <div className="h-4 w-24 rounded bg-gray-200" />
 
-      {/* URL summary */}
       <div className="rounded-lg border border-gray-200 bg-white p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-2 flex-1">
@@ -26,7 +24,6 @@ export default function UrlDetailLoading() {
         </div>
       </div>
 
-      {/* Filter card */}
       <div className="rounded-lg border border-gray-200 bg-white p-5">
         <div className="mb-4 h-4 w-12 rounded bg-gray-200" />
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
@@ -40,7 +37,6 @@ export default function UrlDetailLoading() {
         </div>
       </div>
 
-      {/* Breakdown cards */}
       <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
         {[0, 1, 2].map((i) => (
           <div key={i} className="rounded-lg border border-gray-200 bg-white p-5 space-y-3">
@@ -56,7 +52,6 @@ export default function UrlDetailLoading() {
         ))}
       </div>
 
-      {/* Table */}
       <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
         <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
           <div className="h-4 w-28 rounded bg-gray-200" />

@@ -44,7 +44,6 @@ export default function AdminPage() {
   const [tab, setTab] = useState<Tab>("users");
   const [loading, setLoading] = useState(true);
 
-  // Users state
   const [users, setUsers] = useState<UserInfo[]>([]);
   const [usersMeta, setUsersMeta] = useState<PaginationMeta>({
     total: 0,
@@ -56,7 +55,6 @@ export default function AdminPage() {
   const [usersPage, setUsersPage] = useState(1);
   const [usersLoading, setUsersLoading] = useState(false);
 
-  // URLs state
   const [urls, setUrls] = useState<UrlInfo[]>([]);
   const [urlsMeta, setUrlsMeta] = useState<PaginationMeta>({
     total: 0,
@@ -68,7 +66,6 @@ export default function AdminPage() {
   const [urlsPage, setUrlsPage] = useState(1);
   const [urlsLoading, setUrlsLoading] = useState(false);
 
-  // Edit state
   const [editingUser, setEditingUser] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({
     name: "",
@@ -77,15 +74,11 @@ export default function AdminPage() {
     role: "",
   });
 
-  // Messages
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // Debounce refs
   const usersDebounce = useRef<ReturnType<typeof setTimeout>>(undefined);
   const urlsDebounce = useRef<ReturnType<typeof setTimeout>>(undefined);
-
-  // ── Fetch functions ──
 
   const fetchUsers = useCallback(async (page: number, search: string) => {
     setUsersLoading(true);
@@ -141,8 +134,6 @@ export default function AdminPage() {
     }
   }, []);
 
-  // ── Initial load ──
-
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/auth/signin");
@@ -158,8 +149,6 @@ export default function AdminPage() {
     }
   }, [status, session, router, fetchUsers, fetchUrls]);
 
-  // ── Refetch on page change ──
-
   useEffect(() => {
     if (!loading) fetchUsers(usersPage, usersSearch);
   }, [usersPage]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -167,8 +156,6 @@ export default function AdminPage() {
   useEffect(() => {
     if (!loading) fetchUrls(urlsPage, urlsSearch);
   }, [urlsPage]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // ── Debounced search ──
 
   function handleUsersSearchChange(value: string) {
     setUsersSearch(value);
@@ -188,8 +175,6 @@ export default function AdminPage() {
     }, 300);
   }
 
-  // ── Messages ──
-
   function clearMessages() {
     setError("");
     setSuccess("");
@@ -199,8 +184,6 @@ export default function AdminPage() {
     setSuccess(msg);
     setTimeout(() => setSuccess(""), 3000);
   }
-
-  // ── User CRUD ──
 
   function startEditing(user: UserInfo) {
     clearMessages();
@@ -309,8 +292,6 @@ export default function AdminPage() {
     }
   }
 
-  // ── Pagination helpers ──
-
   function getPageNumbers(
     currentPage: number,
     totalPages: number,
@@ -335,8 +316,6 @@ export default function AdminPage() {
     pages.push(totalPages);
     return pages;
   }
-
-  // ── Render ──
 
   if (status === "loading" || loading) {
     return (
@@ -372,7 +351,6 @@ export default function AdminPage() {
         </p>
       </div>
 
-      {/* Status messages */}
       {error && (
         <div className="rounded-md border border-red-200 bg-red-50 p-3">
           <p className="text-sm text-red-700">{error}</p>
@@ -384,7 +362,6 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* Tabs */}
       <div className="flex gap-1 rounded-lg border border-gray-200 bg-gray-100 p-1">
         <button
           onClick={() => {
@@ -414,10 +391,8 @@ export default function AdminPage() {
         </button>
       </div>
 
-      {/* ═══════════ USERS TAB ═══════════ */}
       {tab === "users" && (
         <div className="space-y-4">
-          {/* Search */}
           <div className="relative">
             <svg
               className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
@@ -441,7 +416,6 @@ export default function AdminPage() {
             />
           </div>
 
-          {/* List */}
           <div className="space-y-3">
             {usersLoading ? (
               <div className="py-8 text-center">
@@ -595,7 +569,6 @@ export default function AdminPage() {
             )}
           </div>
 
-          {/* Pagination */}
           {usersMeta.totalPages > 1 && (
             <Pagination
               meta={usersMeta}
@@ -606,10 +579,8 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* ═══════════ URLS TAB ═══════════ */}
       {tab === "urls" && (
         <div className="space-y-4">
-          {/* Search */}
           <div className="relative">
             <svg
               className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
@@ -633,7 +604,6 @@ export default function AdminPage() {
             />
           </div>
 
-          {/* List */}
           <div className="space-y-3">
             {urlsLoading ? (
               <div className="py-8 text-center">
@@ -686,7 +656,6 @@ export default function AdminPage() {
             )}
           </div>
 
-          {/* Pagination */}
           {urlsMeta.totalPages > 1 && (
             <Pagination
               meta={urlsMeta}
@@ -699,8 +668,6 @@ export default function AdminPage() {
     </div>
   );
 }
-
-// ── Pagination Component ──
 
 function Pagination({
   meta,
@@ -722,7 +689,6 @@ function Pagination({
       </p>
 
       <div className="flex items-center gap-1">
-        {/* Previous */}
         <button
           onClick={() => onPageChange(meta.page - 1)}
           disabled={meta.page <= 1}
@@ -731,7 +697,6 @@ function Pagination({
           Prev
         </button>
 
-        {/* Page numbers */}
         {pages.map((p, i) =>
           p === "..." ? (
             <span
@@ -755,7 +720,6 @@ function Pagination({
           ),
         )}
 
-        {/* Next */}
         <button
           onClick={() => onPageChange(meta.page + 1)}
           disabled={meta.page >= meta.totalPages}

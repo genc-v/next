@@ -71,7 +71,6 @@ const steps = [
 export default function Home() {
   return (
     <div className="space-y-24 pb-16">
-      {/* Hero */}
       <section className="pt-8 text-center md:pt-14">
         <span className="inline-flex items-center rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-medium text-gray-500">
           URL Shortener &amp; Analytics Platform
@@ -102,7 +101,6 @@ export default function Home() {
           </Link>
         </div>
 
-        {/* URL Demo */}
         <div className="mx-auto mt-12 max-w-lg">
           <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
             <div className="border-b border-gray-100 bg-gray-50 px-4 py-2.5">
@@ -139,7 +137,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features */}
       <section>
         <div className="mb-10 text-center">
           <h2 className="text-3xl font-bold tracking-tight text-gray-900">
@@ -173,7 +170,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* How it works */}
       <section>
         <div className="mb-10 text-center">
           <h2 className="text-3xl font-bold tracking-tight text-gray-900">
@@ -198,7 +194,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA */}
       <section className="rounded-2xl border border-gray-200 bg-white p-10 text-center shadow-sm">
         <h2 className="text-3xl font-bold tracking-tight text-gray-900">
           Ready to shorten your first link?

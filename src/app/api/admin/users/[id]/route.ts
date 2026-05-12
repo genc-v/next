@@ -4,7 +4,6 @@ import dbConnect from "@/lib/db";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
 
-// PATCH /api/admin/users/[id] — update user profile, password, or role
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -51,7 +50,6 @@ export async function PATCH(
   }
 }
 
-// DELETE /api/admin/users/[id] — delete user and all their URLs
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -66,7 +64,6 @@ export async function DELETE(
 
     await dbConnect();
 
-    // Prevent deleting oneself
     if (id === session.user.id) {
       return NextResponse.json(
         { error: "Cannot delete your own account" },

@@ -86,7 +86,6 @@ export default function ProfileClient({ initialUser }: ProfileClientProps) {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6 pb-12">
-      {/* Header */}
       <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm md:p-8">
         <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
           Account
@@ -100,7 +99,6 @@ export default function ProfileClient({ initialUser }: ProfileClientProps) {
         </p>
       </section>
 
-      {/* Account info */}
       <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
         <h2 className="mb-4 text-sm font-semibold text-gray-900">Account</h2>
         <div className="rounded-lg bg-gray-50 p-4">
@@ -113,7 +111,6 @@ export default function ProfileClient({ initialUser }: ProfileClientProps) {
         </div>
       </section>
 
-      {/* Name */}
       <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
         <h2 className="mb-4 text-sm font-semibold text-gray-900">Display name</h2>
         <form onSubmit={nameForm.handleSubmit(onNameSubmit)} className="space-y-4">
@@ -149,7 +146,6 @@ export default function ProfileClient({ initialUser }: ProfileClientProps) {
         </form>
       </section>
 
-      {/* Password */}
       <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
         <h2 className="mb-1 text-sm font-semibold text-gray-900">Change password</h2>
 

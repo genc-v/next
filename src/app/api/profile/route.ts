@@ -14,7 +14,6 @@ export async function PATCH(req: Request) {
     const body = await req.json();
     await dbConnect();
 
-    // Password change
     if (body.currentPassword !== undefined || body.newPassword !== undefined) {
       const { currentPassword, newPassword } = body;
 
@@ -53,7 +52,6 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ success: true });
     }
 
-    // Name update
     const { name } = body;
     if (!name || String(name).trim().length < 2) {
       return NextResponse.json(

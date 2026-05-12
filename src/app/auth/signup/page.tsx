@@ -19,7 +19,6 @@ export default function SignUpPage() {
     setLoading(true);
 
     try {
-      // Register the user
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -34,7 +33,6 @@ export default function SignUpPage() {
         return;
       }
 
-      // Auto sign in after registration
       const result = await signIn("credentials", {
         email,
         password,

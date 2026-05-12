@@ -4,7 +4,6 @@ import { auth } from "@/lib/auth";
 import dbConnect from "@/lib/db";
 import User from "@/models/User";
 
-// GET /api/admin/urls?search=&page=1&limit=10
 export async function GET(req: Request) {
   try {
     const session = await auth();
@@ -20,7 +19,6 @@ export async function GET(req: Request) {
     const limit = parseInt(searchParams.get("limit") || "10", 10);
     const skip = (page - 1) * limit;
 
-    // Use aggregation to unwind links and search through them
     const pipeline: PipelineStage[] = [
       { $unwind: "$links" }
     ];
@@ -38,12 +36,10 @@ export async function GET(req: Request) {
       });
     }
 
-    // Count pipeline
     const countPipeline = [...pipeline, { $count: "total" }];
     const countResult = await User.aggregate(countPipeline);
     const total = countResult.length > 0 ? countResult[0].total : 0;
 
-    // Data pipeline
     pipeline.push(
       { $sort: { "links.createdAt": -1 } },
       { $skip: skip },
@@ -91,7 +87,6 @@ export async function GET(req: Request) {
   }
 }
 
-// DELETE /api/admin/urls?id=xxx — delete any URL by code
 export async function DELETE(req: Request) {
   try {
     const session = await auth();

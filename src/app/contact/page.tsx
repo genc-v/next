@@ -41,7 +41,6 @@ export default function ContactPage() {
 
   return (
     <div className="mx-auto max-w-5xl space-y-8 pb-16 pt-6">
-      {/* Header */}
       <div>
         <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
           Contact
@@ -56,7 +55,6 @@ export default function ContactPage() {
       </div>
 
       <div className="grid gap-8 md:grid-cols-[1fr_1.4fr]">
-        {/* Info */}
         <div className="space-y-5">
           <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
             <h2 className="font-semibold text-gray-900">About the form</h2>
@@ -100,7 +98,6 @@ export default function ContactPage() {
           </div>
         </div>
 
-        {/* Form */}
         <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm md:p-8">
           {success ? (
             <div className="flex h-full flex-col items-center justify-center py-8 text-center">
