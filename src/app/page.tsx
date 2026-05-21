@@ -15,7 +15,7 @@ export default async function Home() {
             Shorten, organize, and manage links from one dashboard.
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-gray-600">
-            Create short, memorable URLs, save product packages as favorites, and
+            Create short, memorable URLs, save important links as favorites, and
             use admin tools for user and link management.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
@@ -59,9 +59,9 @@ export default async function Home() {
           <h2 className="font-semibold text-gray-900">Contact</h2>
           <p className="mt-2 text-sm text-gray-600">Validated contact form stored in MongoDB.</p>
         </Link>
-        <Link href="/stats" className="rounded-lg border border-gray-200 bg-white p-5 hover:border-gray-300">
-          <h2 className="font-semibold text-gray-900">Stats</h2>
-          <p className="mt-2 text-sm text-gray-600">SSG and ISR example page for the rubric.</p>
+        <Link href="/faq" className="rounded-lg border border-gray-200 bg-white p-5 hover:border-gray-300">
+          <h2 className="font-semibold text-gray-900">FAQ</h2>
+          <p className="mt-2 text-sm text-gray-600">Answers about accounts, links, and favorites.</p>
         </Link>
       </div>
     </div>

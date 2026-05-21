@@ -16,10 +16,10 @@ export async function GET(
 
     await dbConnect();
 
-    // Find the user containing this link
-    const user = await User.findOne(
+    const user = await User.findOneAndUpdate(
       { "links.code": code },
-      { "links.$": 1 }
+      { $inc: { "links.$.clicks": 1 } },
+      { new: true, projection: { "links.$": 1 } }
     );
 
     if (!user || !user.links || user.links.length === 0) {

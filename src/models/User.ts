@@ -5,6 +5,8 @@ export type UserRole = "user" | "admin";
 export interface ILink {
   code: string;
   originalUrl: string;
+  clicks: number;
+  favorite: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -32,6 +34,14 @@ const LinkSchema = new Schema<ILink>(
     originalUrl: {
       type: String,
       required: true,
+    },
+    clicks: {
+      type: Number,
+      default: 0,
+    },
+    favorite: {
+      type: Boolean,
+      default: false,
     },
   },
   {

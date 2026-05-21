@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 import UrlForm from "@/components/UrlForm";
 import UrlList from "@/components/UrlList";
-import { Link as LinkIcon, BarChart3, Activity } from "lucide-react";
+import { Link as LinkIcon, BarChart3, Heart } from "lucide-react";
 
 interface ShortenedUrl {
   _id?: string;
@@ -13,6 +13,8 @@ interface ShortenedUrl {
   code: string;
   originalUrl: string;
   shortUrl?: string;
+  clicks?: number;
+  favorite?: boolean;
   createdAt: string;
 }
 
@@ -20,6 +22,7 @@ export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [urls, setUrls] = useState<ShortenedUrl[]>([]);
+  const [stats, setStats] = useState({ totalUrls: 0, totalClicks: 0, favoriteCount: 0 });
   const [loading, setLoading] = useState(true);
 
   const fetchUrls = useCallback(async () => {
@@ -28,6 +31,11 @@ export default function DashboardPage() {
       const data = await res.json();
       if (res.ok) {
         setUrls(data.urls);
+        setStats({
+          totalUrls: data.totalUrls ?? data.urls.length,
+          totalClicks: data.totalClicks ?? 0,
+          favoriteCount: data.favoriteCount ?? 0,
+        });
       }
     } catch (error) {
       console.error("Failed to fetch URLs:", error);
@@ -62,15 +70,27 @@ export default function DashboardPage() {
 
   function handleUrlCreated(url: ShortenedUrl) {
     setUrls((prev) => [url, ...prev]);
+    setStats((prev) => ({ ...prev, totalUrls: prev.totalUrls + 1 }));
   }
 
   function handleUrlDeleted(id: string) {
+    const deleted = urls.find((u) => (u.id || u._id || u.code) === id);
     setUrls((prev) => prev.filter((u) => (u.id || u._id || u.code) !== id));
+    setStats((current) => ({
+      ...current,
+      totalUrls: Math.max(0, current.totalUrls - 1),
+      totalClicks: Math.max(0, current.totalClicks - (deleted?.clicks || 0)),
+      favoriteCount: Math.max(0, current.favoriteCount - (deleted?.favorite ? 1 : 0)),
+    }));
   }
 
-  // Calculate some simple mock stats based on URLs count
-  const totalUrls = urls.length;
-  const mockClicks = totalUrls * Math.floor(Math.random() * 50 + 10);
+  function handleUrlFavoriteChanged(code: string, favorite: boolean) {
+    setUrls((prev) => prev.map((url) => (url.code === code ? { ...url, favorite } : url)));
+    setStats((prev) => ({
+      ...prev,
+      favoriteCount: Math.max(0, prev.favoriteCount + (favorite ? 1 : -1)),
+    }));
+  }
 
   return (
     <div className="mx-auto max-w-6xl space-y-8 pb-12">
@@ -85,7 +105,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="overflow-hidden rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
           <div className="flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
@@ -93,7 +113,7 @@ export default function DashboardPage() {
             </div>
             <div>
               <p className="text-sm font-medium text-gray-500">Total Links</p>
-              <p className="text-2xl font-bold text-gray-900">{totalUrls}</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.totalUrls}</p>
             </div>
           </div>
         </div>
@@ -104,20 +124,20 @@ export default function DashboardPage() {
               <BarChart3 size={24} />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-500">Total Clicks (Est.)</p>
-              <p className="text-2xl font-bold text-gray-900">{mockClicks}</p>
+              <p className="text-sm font-medium text-gray-500">Total Clicks</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.totalClicks}</p>
             </div>
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white p-6 shadow-sm sm:col-span-2 lg:col-span-1">
+        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-purple-50 text-purple-600">
-              <Activity size={24} />
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-rose-50 text-rose-600">
+              <Heart size={24} />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-500">Account Status</p>
-              <p className="text-2xl font-bold text-gray-900">Active</p>
+              <p className="text-sm font-medium text-gray-500">Favorite Links</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.favoriteCount}</p>
             </div>
           </div>
         </div>
@@ -148,7 +168,11 @@ export default function DashboardPage() {
               </span>
             </div>
             <div className="p-6">
-              <UrlList urls={urls} onUrlDeleted={handleUrlDeleted} />
+              <UrlList
+                urls={urls}
+                onUrlDeleted={handleUrlDeleted}
+                onFavoriteChanged={handleUrlFavoriteChanged}
+              />
             </div>
           </div>
         </div>

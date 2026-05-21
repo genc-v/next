@@ -56,6 +56,8 @@ export async function GET(req: Request) {
           userEmail: "$email",
           code: "$links.code",
           originalUrl: "$links.originalUrl",
+          clicks: "$links.clicks",
+          favorite: "$links.favorite",
           createdAt: "$links.createdAt",
           updatedAt: "$links.updatedAt"
         }

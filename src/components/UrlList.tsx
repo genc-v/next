@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, Check, Trash2, ExternalLink } from "lucide-react";
+import { Copy, Check, Trash2, ExternalLink, Heart } from "lucide-react";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 
 interface ShortenedUrl {
@@ -10,17 +10,21 @@ interface ShortenedUrl {
   code: string;
   originalUrl: string;
   shortUrl?: string;
+  clicks?: number;
+  favorite?: boolean;
   createdAt: string;
 }
 
 interface UrlListProps {
   urls: ShortenedUrl[];
   onUrlDeleted: (id: string) => void;
+  onFavoriteChanged?: (code: string, favorite: boolean) => void;
 }
 
-export default function UrlList({ urls, onUrlDeleted }: UrlListProps) {
+export default function UrlList({ urls, onUrlDeleted, onFavoriteChanged }: UrlListProps) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [favoriteLoadingId, setFavoriteLoadingId] = useState<string | null>(null);
   const { copyToClipboard } = useCopyToClipboard();
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -57,6 +61,27 @@ export default function UrlList({ urls, onUrlDeleted }: UrlListProps) {
       console.error("Failed to delete URL:", error);
     } finally {
       setDeletingId(null);
+    }
+  }
+
+  async function handleFavorite(url: ShortenedUrl) {
+    const nextFavorite = !url.favorite;
+    setFavoriteLoadingId(url.code);
+
+    try {
+      const res = await fetch("/api/urls", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: url.code, favorite: nextFavorite }),
+      });
+
+      if (res.ok) {
+        onFavoriteChanged?.(url.code, nextFavorite);
+      }
+    } catch (error) {
+      console.error("Failed to update favorite:", error);
+    } finally {
+      setFavoriteLoadingId(null);
     }
   }
 
@@ -103,9 +128,23 @@ export default function UrlList({ urls, onUrlDeleted }: UrlListProps) {
                 <span>{new Date(url.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</span>
                 <span className="h-1 w-1 rounded-full bg-gray-300"></span>
                 <span>ID: {url.code}</span>
+                <span className="h-1 w-1 rounded-full bg-gray-300"></span>
+                <span>{url.clicks || 0} clicks</span>
               </div>
             </div>
             <div className="flex items-center gap-2 sm:ml-4 border-t border-gray-100 sm:border-0 pt-3 sm:pt-0">
+              <button
+                onClick={() => handleFavorite(url)}
+                disabled={favoriteLoadingId === url.code}
+                className={`flex items-center justify-center rounded-md border p-1.5 transition-colors ${
+                  url.favorite
+                    ? "border-rose-200 bg-rose-50 text-rose-600"
+                    : "border-gray-200 bg-white text-gray-400 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
+                }`}
+                title={url.favorite ? "Remove from favorites" : "Add to favorites"}
+              >
+                <Heart size={14} fill={url.favorite ? "currentColor" : "none"} />
+              </button>
               <button
                 onClick={() => handleCopy(url)}
                 className={`flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${

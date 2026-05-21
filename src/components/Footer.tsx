@@ -7,7 +7,6 @@ export default function Footer() {
         <p>&copy; {new Date().getFullYear()} Next URL Shortener. All rights reserved.</p>
         <div className="flex justify-center gap-4 mt-2">
           <Link href="/products" className="hover:text-black">Products</Link>
-          <Link href="/stats" className="hover:text-black">Stats</Link>
           <Link href="/about" className="hover:text-black">About</Link>
           <Link href="/contact" className="hover:text-black">Contact</Link>
           <Link href="/faq" className="hover:text-black">FAQ</Link>

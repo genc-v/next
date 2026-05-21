@@ -5,7 +5,7 @@ import User from "@/models/User";
 import { generateShortCode, isValidUrl } from "@/lib/utils";
 
 // GET /api/urls — fetch all URLs for the logged-in user
-export async function GET() {
+export async function GET(req: Request) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -19,14 +19,22 @@ export async function GET() {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    const { searchParams } = new URL(req.url);
+    const favoriteOnly = searchParams.get("favorite") === "true";
+
     // Return the URLs sorted by creation date (newest first)
-    const urls = [...user.links].sort((a, b) => {
+    const urls = [...user.links]
+      .filter((link) => !favoriteOnly || link.favorite)
+      .sort((a, b) => {
       const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
       const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
       return dateB - dateA;
     });
 
-    return NextResponse.json({ urls });
+    const totalClicks = user.links.reduce((sum, link) => sum + (link.clicks || 0), 0);
+    const favoriteCount = user.links.filter((link) => link.favorite).length;
+
+    return NextResponse.json({ urls, totalUrls: user.links.length, totalClicks, favoriteCount });
   } catch (error) {
     console.error("Error fetching URLs:", error);
     return NextResponse.json(
@@ -67,6 +75,8 @@ export async function POST(req: Request) {
     const newLink = {
       code,
       originalUrl: url,
+      clicks: 0,
+      favorite: false,
     };
 
     const user = await User.findByIdAndUpdate(
@@ -111,10 +121,28 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { code, url } = await req.json();
-    if (!code || !url || !isValidUrl(url)) {
+    const { code, url, favorite } = await req.json();
+    if (!code) {
       return NextResponse.json(
-        { error: "A URL code and valid destination URL are required" },
+        { error: "URL code is required" },
+        { status: 400 }
+      );
+    }
+
+    if (url && !isValidUrl(url)) {
+      return NextResponse.json(
+        { error: "A valid destination URL is required" },
+        { status: 400 }
+      );
+    }
+
+    const updates: Record<string, string | boolean> = {};
+    if (url) updates["links.$.originalUrl"] = url;
+    if (typeof favorite === "boolean") updates["links.$.favorite"] = favorite;
+
+    if (Object.keys(updates).length === 0) {
+      return NextResponse.json(
+        { error: "No URL updates were provided" },
         { status: 400 }
       );
     }
@@ -122,7 +150,7 @@ export async function PATCH(req: Request) {
     await dbConnect();
     const user = await User.findOneAndUpdate(
       { _id: session.user.id, "links.code": code },
-      { $set: { "links.$.originalUrl": url } },
+      { $set: updates },
       { new: true }
     );
 

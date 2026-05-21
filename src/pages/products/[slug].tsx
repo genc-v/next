@@ -42,16 +42,9 @@ export default function ProductDetailsPage({ product }: ProductDetailsProps) {
           </ul>
         </div>
 
-        <form action="/api/favorites" method="post" className="mt-8">
-          <input type="hidden" name="productSlug" value={product.slug} />
-          <input type="hidden" name="productName" value={product.name} />
-          <button
-            type="submit"
-            className="rounded-md bg-black px-5 py-2.5 text-sm font-medium text-white hover:bg-gray-800"
-          >
-            Add to favorites
-          </button>
-        </form>
+        <div className="mt-8 rounded-md bg-gray-50 p-4 text-sm text-gray-600">
+          Favorites are managed from your shortened URLs in the dashboard.
+        </div>
       </section>
     </div>
   );
