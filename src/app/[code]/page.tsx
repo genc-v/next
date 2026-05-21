@@ -33,10 +33,13 @@ export default async function ShortCodePage({
 
   try {
     await dbConnect();
-    const user = await User.findOneAndUpdate(
+    await User.findOneAndUpdate(
       { "links.code": code },
-      { $inc: { "links.$.clicks": 1 } },
-      { new: true, projection: { "links.$": 1 } }
+      { $inc: { "links.$.clicks": 1 } }
+    );
+    const user = await User.findOne(
+      { "links.code": code },
+      { "links.$": 1 }
     );
     originalUrl = user?.links?.[0]?.originalUrl;
   } catch (error) {
