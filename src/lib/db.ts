@@ -23,7 +23,10 @@ async function dbConnect(): Promise<typeof mongoose> {
   }
 
   if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI).then((m) => m);
+    cached.promise = mongoose.connect(MONGODB_URI).then((m) => m).catch((error) => {
+      cached.promise = null;
+      throw error;
+    });
   }
 
   cached.conn = await cached.promise;

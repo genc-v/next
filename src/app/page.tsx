@@ -1,9 +1,6 @@
-import { auth } from "@/lib/auth";
 import Link from "next/link";
 
-export default async function Home() {
-  const session = await auth();
-
+export default function Home() {
   return (
     <div className="space-y-12">
       <section className="grid min-h-[62vh] items-center gap-10 md:grid-cols-[1.15fr_0.85fr]">
@@ -20,10 +17,10 @@ export default async function Home() {
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
-              href={session?.user ? "/dashboard" : "/auth/signup"}
+              href="/dashboard"
               className="rounded-md bg-black px-6 py-3 text-sm font-medium text-white hover:bg-gray-800"
             >
-              {session?.user ? "Open dashboard" : "Get started"}
+              Open dashboard
             </Link>
             <Link
               href="/about"

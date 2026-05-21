@@ -27,19 +27,24 @@ export default async function ShortCodePage({
     redirect("/");
   }
 
-  await dbConnect();
+  let originalUrl: string | undefined;
 
-  const user = await User.findOneAndUpdate(
-    { "links.code": code },
-    { $inc: { "links.$.clicks": 1 } },
-    { new: true, projection: { "links.$": 1 } }
-  );
-
-  const link = user?.links?.[0];
-
-  if (!link?.originalUrl) {
+  try {
+    await dbConnect();
+    const user = await User.findOneAndUpdate(
+      { "links.code": code },
+      { $inc: { "links.$.clicks": 1 } },
+      { new: true, projection: { "links.$": 1 } }
+    );
+    originalUrl = user?.links?.[0]?.originalUrl;
+  } catch (error) {
+    console.error("Short-code redirect failed:", error);
     redirect("/");
   }
 
-  redirect(link.originalUrl);
+  if (!originalUrl) {
+    redirect("/");
+  }
+
+  redirect(originalUrl);
 }
