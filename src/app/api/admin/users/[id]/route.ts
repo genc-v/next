@@ -2,6 +2,54 @@ import { NextResponse, NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
 import dbConnect from "@/lib/db";
 import User from "@/models/User";
+import bcrypt from "bcryptjs";
+
+// PATCH /api/admin/users/[id] — update user profile, password, or role
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const session = await auth();
+    if (session?.user?.role !== "admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { id } = await params;
+    const body = await req.json();
+    const updates: Record<string, string> = {};
+
+    if (body.name) updates.name = String(body.name).trim();
+    if (body.email) updates.email = String(body.email).toLowerCase().trim();
+    if (body.role && ["user", "admin"].includes(body.role)) updates.role = body.role;
+    if (body.password) updates.hashedPassword = await bcrypt.hash(body.password, 12);
+
+    await dbConnect();
+    const user = await User.findByIdAndUpdate(id, updates, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({
+      user: {
+        id: user._id.toString(),
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    console.error("Admin update user error:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}
 
 // DELETE /api/admin/users/[id] — delete user and all their URLs
 export async function DELETE(

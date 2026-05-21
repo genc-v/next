@@ -15,6 +15,7 @@ export async function POST(req: Request) {
     const newMessage = await ContactMessage.create({ name, email, message });
     return NextResponse.json({ success: true, message: newMessage }, { status: 201 });
   } catch (error) {
+    console.error("Contact form error:", error);
     return NextResponse.json({ error: "Failed to send message" }, { status: 500 });
   }
 }

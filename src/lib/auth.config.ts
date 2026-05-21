@@ -34,9 +34,11 @@ export default {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
       const isOnDashboard = nextUrl.pathname.startsWith("/dashboard");
+      const isOnProfile = nextUrl.pathname.startsWith("/profile");
+      const isOnFavorites = nextUrl.pathname.startsWith("/favorites");
       const isOnAdmin = nextUrl.pathname.startsWith("/admin");
 
-      if ((isOnDashboard || isOnAdmin) && !isLoggedIn) {
+      if ((isOnDashboard || isOnProfile || isOnFavorites || isOnAdmin) && !isLoggedIn) {
         return false; // Redirect to sign-in
       }
 

@@ -103,6 +103,44 @@ export async function POST(req: Request) {
   }
 }
 
+// PATCH /api/urls — update a specific URL by code for the logged-in user
+export async function PATCH(req: Request) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { code, url } = await req.json();
+    if (!code || !url || !isValidUrl(url)) {
+      return NextResponse.json(
+        { error: "A URL code and valid destination URL are required" },
+        { status: 400 }
+      );
+    }
+
+    await dbConnect();
+    const user = await User.findOneAndUpdate(
+      { _id: session.user.id, "links.code": code },
+      { $set: { "links.$.originalUrl": url } },
+      { new: true }
+    );
+
+    if (!user) {
+      return NextResponse.json({ error: "URL not found" }, { status: 404 });
+    }
+
+    const updatedLink = user.links.find((link) => link.code === code);
+    return NextResponse.json({ url: updatedLink });
+  } catch (error) {
+    console.error("Error updating URL:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}
+
 // DELETE /api/urls?code=xxx — delete a specific URL by code for the logged-in user
 export async function DELETE(req: Request) {
   try {

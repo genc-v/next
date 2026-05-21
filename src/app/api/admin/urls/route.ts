@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import type { PipelineStage } from "mongoose";
 import { auth } from "@/lib/auth";
 import dbConnect from "@/lib/db";
 import User from "@/models/User";
@@ -20,7 +21,7 @@ export async function GET(req: Request) {
     const skip = (page - 1) * limit;
 
     // Use aggregation to unwind links and search through them
-    const pipeline: any[] = [
+    const pipeline: PipelineStage[] = [
       { $unwind: "$links" }
     ];
 

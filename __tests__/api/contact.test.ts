@@ -2,7 +2,7 @@
 
 describe("Contact API Logic", () => {
   it("validates missing fields", () => {
-    const payload = { name: "Test" };
+    const payload: Partial<{ name: string; email: string; message: string }> = { name: "Test" };
     const isValid = payload.name && payload.email && payload.message;
     expect(isValid).toBeFalsy();
   });

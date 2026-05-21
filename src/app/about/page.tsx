@@ -7,7 +7,7 @@ export default function AboutPage() {
         <div className="space-y-4 text-gray-700">
           <p>
             Welcome to the Next URL Shortener. This project was built as part of a 
-            university assignment for "Zhvillim i Ueb-it në Anën e Klientit".
+            university assignment for &quot;Zhvillim i Ueb-it në Anën e Klientit&quot;.
           </p>
           <p>
             It uses modern web technologies including Next.js, NextAuth, MongoDB, 

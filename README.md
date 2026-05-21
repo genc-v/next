@@ -7,6 +7,7 @@ Ky projekt u zhvillua si detyrë për lëndën "Zhvillim i Ueb-it në Anën e Kl
 - Shkurtuar URL të gjata.
 - Autentifikuar përdorues me Credentials ose Google.
 - Menaxhuar përdoruesit dhe linqet nëpërmjet një Paneli Admini.
+- Shfletuar produkte/artikuj me SSG, faqe dinamike me `getStaticPaths`, dhe Favorites për përdoruesit e loguar.
 - Ndërvepruar me forma të validuara dhe UI të përshtatshëm (Responsive Design).
 
 ## Linku i Aplikacionit Live
@@ -41,6 +42,7 @@ Për ta ekzekutuar këtë projekt në lokalin tuaj, ndiqni këto hapa:
    AUTH_SECRET=your_nextauth_secret
    GOOGLE_CLIENT_ID=your_google_client_id
    GOOGLE_CLIENT_SECRET=your_google_client_secret
+   NEXT_PUBLIC_APP_URL=http://localhost:3000
    ```
 
 4. **Ekzekutoni Serverin e Zhvillimit:**
@@ -63,3 +65,24 @@ Për ta ekzekutuar këtë projekt në lokalin tuaj, ndiqni këto hapa:
 - **Autentifikim:** NextAuth.js
 - **Forma & Validime:** React Hook Form
 - **Testim:** Jest & React Testing Library
+
+## Faqet Kryesore
+- `/` Home
+- `/about` About
+- `/contact` Contact form
+- `/auth/signin` dhe `/auth/signup`
+- `/dashboard` Dashboard për përdorues të loguar
+- `/admin` Admin Panel vetëm për admin
+- `/products` Products me SSG dhe ISR
+- `/products/[slug]` Product Details me `getStaticPaths`
+- `/profile` Profile me përditësim të emrit
+- `/favorites` Favorites për përdorues të loguar
+- `/faq` dhe `/stats` faqe bonus
+
+## Verifikim Lokal
+```bash
+npm run lint
+npx tsc --noEmit
+npm test -- --runInBand
+npm run build
+```
