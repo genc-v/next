@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useRef, useEffect } from "react";
-import { Menu, X, LayoutDashboard, Shield, User, LogOut, ChevronDown, Link as LinkIcon, Info, Mail, HelpCircle, Package, Heart } from "lucide-react";
+import { Menu, X, LayoutDashboard, Shield, User, LogOut, ChevronDown, Link as LinkIcon, Info, Mail, HelpCircle, Heart } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 export default function Navbar() {
@@ -26,7 +26,6 @@ export default function Navbar() {
 
   const navLinks = [
     { name: "Home", href: "/", icon: <LinkIcon size={18} /> },
-    { name: "Products", href: "/products", icon: <Package size={18} /> },
     { name: "About", href: "/about", icon: <Info size={18} /> },
     { name: "Contact", href: "/contact", icon: <Mail size={18} /> },
     { name: "FAQ", href: "/faq", icon: <HelpCircle size={18} /> },

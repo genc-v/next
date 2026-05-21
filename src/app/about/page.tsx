@@ -8,7 +8,7 @@ const features = [
   },
   {
     title: "MongoDB data",
-    text: "Users, contact messages, and products are modeled with Mongoose, while each user owns their shortened URLs.",
+    text: "Users and contact messages are modeled with Mongoose, while each user owns their shortened URLs.",
     icon: Database,
   },
   {

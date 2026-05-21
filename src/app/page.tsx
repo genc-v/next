@@ -26,17 +26,17 @@ export default async function Home() {
               {session?.user ? "Open dashboard" : "Get started"}
             </Link>
             <Link
-              href="/products"
+              href="/about"
               className="rounded-md border border-gray-300 bg-white px-6 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
-              View products
+              View project
             </Link>
           </div>
         </div>
 
         <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
           <div className="space-y-3">
-            {["Create short URLs", "Review saved links", "Browse products", "Manage admin data"].map(
+            {["Create short URLs", "Review saved links", "Track real clicks", "Manage admin data"].map(
               (item) => (
                 <div
                   key={item}

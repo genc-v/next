@@ -16,8 +16,8 @@ const faqs = [
     a: "Each redirect increments the click counter for the matching shortened URL. The dashboard total is calculated from those stored values.",
   },
   {
-    q: "Which pages demonstrate static generation?",
-    a: "The Products listing and Product Details pages use static generation with ISR. Product Details also uses getStaticPaths for dynamic routes.",
+    q: "Why does the dashboard load quickly after navigation?",
+    a: "The dashboard, profile, and favorites pages load their first data on the server, then client-side actions update the interface without a full page reload.",
   },
 ];
 

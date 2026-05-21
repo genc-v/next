@@ -8,7 +8,7 @@ import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: "Shorty URL Shortener",
-  description: "A Next.js URL shortener with authentication, admin tools, products, and favorites.",
+  description: "A Next.js URL shortener with authentication, admin tools, click tracking, and favorites.",
 };
 
 export default function RootLayout({

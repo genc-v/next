@@ -99,7 +99,10 @@ export async function POST(req: Request) {
           code: createdLink?.code,
           originalUrl: createdLink?.originalUrl,
           shortUrl: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/${createdLink?.code}`,
+          clicks: createdLink?.clicks || 0,
+          favorite: !!createdLink?.favorite,
           createdAt: createdLink?.createdAt,
+          updatedAt: createdLink?.updatedAt,
         },
       },
       { status: 201 }

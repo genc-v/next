@@ -4,11 +4,14 @@ import { useState } from "react";
 import { Link2, Loader2, Sparkles } from "lucide-react";
 
 interface ShortenedUrl {
-  id: string;
+  id?: string;
   code: string;
   originalUrl: string;
   shortUrl: string;
+  clicks: number;
+  favorite: boolean;
   createdAt: string;
+  updatedAt: string;
 }
 
 interface UrlFormProps {

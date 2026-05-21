@@ -7,7 +7,6 @@ Ky projekt u zhvillua si detyrë për lëndën "Zhvillim i Ueb-it në Anën e Kl
 - Shkurtuar URL të gjata.
 - Autentifikuar përdorues me Credentials ose Google.
 - Menaxhuar përdoruesit dhe linqet nëpërmjet një Paneli Admini.
-- Shfletuar produkte/artikuj me SSG dhe faqe dinamike me `getStaticPaths`.
 - Ruajtur URL të preferuara për përdoruesit e loguar.
 - Ndërvepruar me forma të validuara dhe UI të përshtatshëm (Responsive Design).
 
@@ -74,8 +73,6 @@ Për ta ekzekutuar këtë projekt në lokalin tuaj, ndiqni këto hapa:
 - `/auth/signin` dhe `/auth/signup`
 - `/dashboard` Dashboard për përdorues të loguar
 - `/admin` Admin Panel vetëm për admin
-- `/products` Products me SSG dhe ISR
-- `/products/[slug]` Product Details me `getStaticPaths`
 - `/profile` Profile me përditësim të emrit
 - `/favorites` Favorites për përdorues të loguar
 - `/faq` faqe bonus
