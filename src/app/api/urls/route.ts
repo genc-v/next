@@ -4,7 +4,7 @@ import dbConnect from "@/lib/db";
 import User from "@/models/User";
 import { generateShortCode, isValidUrl } from "@/lib/utils";
 
-// GET /api/urls — fetch all URLs for the logged-in user
+// GET /api/urls — fetch URLs for the logged-in user (paginated)
 export async function GET(req: Request) {
   try {
     const session = await auth();
@@ -21,9 +21,12 @@ export async function GET(req: Request) {
 
     const { searchParams } = new URL(req.url);
     const favoriteOnly = searchParams.get("favorite") === "true";
+    const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
+    const limit = Math.min(50, Math.max(1, parseInt(searchParams.get("limit") || "10", 10)));
+    const skip = (page - 1) * limit;
 
-    // Return the URLs sorted by creation date (newest first)
-    const urls = [...user.links]
+    // Sort by creation date (newest first), then paginate
+    const sortedLinks = [...user.links]
       .filter((link) => !favoriteOnly || link.favorite)
       .sort((a, b) => {
       const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
@@ -31,10 +34,35 @@ export async function GET(req: Request) {
       return dateB - dateA;
     });
 
+    const totalFiltered = sortedLinks.length;
+    const totalPages = Math.ceil(totalFiltered / limit);
+    const paginatedLinks = sortedLinks.slice(skip, skip + limit);
+
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
+    const urls = paginatedLinks.map((link) => ({
+      code: link.code,
+      originalUrl: link.originalUrl,
+      shortUrl: `${appUrl}/${link.code}`,
+      clicks: link.clicks || 0,
+      favorite: !!link.favorite,
+      createdAt: link.createdAt?.toISOString() || new Date().toISOString(),
+      updatedAt: link.updatedAt?.toISOString() || new Date().toISOString(),
+    }));
+
     const totalClicks = user.links.reduce((sum, link) => sum + (link.clicks || 0), 0);
     const favoriteCount = user.links.filter((link) => link.favorite).length;
 
-    return NextResponse.json({ urls, totalUrls: user.links.length, totalClicks, favoriteCount });
+    return NextResponse.json({
+      urls,
+      totalUrls: totalFiltered,
+      totalClicks,
+      favoriteCount,
+      page,
+      limit,
+      totalPages,
+      hasMore: page < totalPages,
+    });
   } catch (error) {
     console.error("Error fetching URLs:", error);
     return NextResponse.json(

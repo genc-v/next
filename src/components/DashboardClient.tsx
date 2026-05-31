@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import UrlForm from "@/components/UrlForm";
 import UrlList from "@/components/UrlList";
-import { Link as LinkIcon, BarChart3, Heart } from "lucide-react";
+import { Link as LinkIcon, BarChart3, Heart, ChevronLeft, ChevronRight } from "lucide-react";
 import type { SerializedLink, UserLinkSummary } from "@/lib/user-links";
 
 type DashboardClientProps = {
@@ -17,11 +17,38 @@ type CreatedLink = Omit<SerializedLink, "updatedAt"> & {
 
 export default function DashboardClient({ userLabel, initialData }: DashboardClientProps) {
   const [urls, setUrls] = useState<SerializedLink[]>(initialData.urls);
+  const [page, setPage] = useState(initialData.page);
+  const [totalPages, setTotalPages] = useState(initialData.totalPages);
+  const [pageLoading, setPageLoading] = useState(false);
   const [stats, setStats] = useState({
     totalUrls: initialData.totalUrls,
     totalClicks: initialData.totalClicks,
     favoriteCount: initialData.favoriteCount,
+    limit: initialData.limit,
   });
+
+  const fetchPage = useCallback(async (newPage: number) => {
+    setPageLoading(true);
+    try {
+      const res = await fetch(`/api/urls?page=${newPage}&limit=${stats.limit}`);
+      if (res.ok) {
+        const data = await res.json();
+        setUrls(data.urls);
+        setPage(data.page);
+        setTotalPages(data.totalPages);
+        setStats({
+          totalUrls: data.totalUrls,
+          totalClicks: data.totalClicks,
+          favoriteCount: data.favoriteCount,
+          limit: data.limit,
+        });
+      }
+    } catch (err) {
+      console.error("Failed to fetch page:", err);
+    } finally {
+      setPageLoading(false);
+    }
+  }, [stats.limit]);
 
   function handleUrlCreated(url: CreatedLink) {
     setUrls((prev) => [{ ...url, updatedAt: url.updatedAt || url.createdAt }, ...prev]);
@@ -122,6 +149,40 @@ export default function DashboardClient({ userLabel, initialData }: DashboardCli
                 onFavoriteChanged={handleUrlFavoriteChanged}
               />
             </div>
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 border-t border-gray-200 px-6 py-4">
+                <button
+                  onClick={() => fetchPage(page - 1)}
+                  disabled={page <= 1 || pageLoading}
+                  className="flex items-center gap-1 rounded-md border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  <ChevronLeft size={14} />
+                  Previous
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => fetchPage(p)}
+                    disabled={pageLoading}
+                    className={`flex h-8 w-8 items-center justify-center rounded-md text-xs font-medium transition-colors ${
+                      p === page
+                        ? "bg-black text-white"
+                        : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+                    }`}
+                  >
+                    {p}
+                  </button>
+                ))}
+                <button
+                  onClick={() => fetchPage(page + 1)}
+                  disabled={page >= totalPages || pageLoading}
+                  className="flex items-center gap-1 rounded-md border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Next
+                  <ChevronRight size={14} />
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
