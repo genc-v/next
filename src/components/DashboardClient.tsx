@@ -66,6 +66,15 @@ export default function DashboardClient({ userLabel, initialData }: DashboardCli
     }));
   }
 
+  function handleUrlClicked(code: string) {
+    setUrls((prev) =>
+      prev.map((url) =>
+        url.code === code ? { ...url, clicks: (url.clicks || 0) + 1 } : url
+      )
+    );
+    setStats((prev) => ({ ...prev, totalClicks: prev.totalClicks + 1 }));
+  }
+
   function handleUrlFavoriteChanged(code: string, favorite: boolean) {
     setUrls((prev) => prev.map((url) => (url.code === code ? { ...url, favorite } : url)));
     setStats((prev) => ({
@@ -147,6 +156,7 @@ export default function DashboardClient({ userLabel, initialData }: DashboardCli
                 urls={urls}
                 onUrlDeleted={handleUrlDeleted}
                 onFavoriteChanged={handleUrlFavoriteChanged}
+                onUrlClicked={handleUrlClicked}
               />
             </div>
             {totalPages > 1 && (

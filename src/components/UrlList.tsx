@@ -19,9 +19,10 @@ interface UrlListProps {
   urls: ShortenedUrl[];
   onUrlDeleted: (id: string) => void;
   onFavoriteChanged?: (code: string, favorite: boolean) => void;
+  onUrlClicked?: (code: string) => void;
 }
 
-export default function UrlList({ urls, onUrlDeleted, onFavoriteChanged }: UrlListProps) {
+export default function UrlList({ urls, onUrlDeleted, onFavoriteChanged, onUrlClicked }: UrlListProps) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [favoriteLoadingId, setFavoriteLoadingId] = useState<string | null>(null);
@@ -115,6 +116,7 @@ export default function UrlList({ urls, onUrlDeleted, onFavoriteChanged }: UrlLi
                   href={shortLink} 
                   target="_blank" 
                   rel="noopener noreferrer"
+                  onClick={() => onUrlClicked?.(url.code)}
                   className="text-sm font-semibold text-blue-600 hover:underline flex items-center gap-1.5"
                 >
                   {shortLink}
