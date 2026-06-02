@@ -1,7 +1,10 @@
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import Link from "next/link";
 import dbConnect from "@/lib/db";
 import User from "@/models/User";
+import Click from "@/models/Click";
+import { parseUA } from "@/lib/utils";
 
 const reservedPaths = new Set([
   "about",
@@ -13,7 +16,7 @@ const reservedPaths = new Set([
   "faq",
   "favorites",
   "profile",
-  "products",
+  "urls",
   "_next",
 ]);
 
@@ -33,15 +36,37 @@ export default async function ShortCodePage({
 
   try {
     await dbConnect();
+
+    const headersList = await headers();
+    const ua = headersList.get("user-agent") || "";
+    const referrer = headersList.get("referer") || "";
+    const ip = (headersList.get("x-forwarded-for") || "").split(",")[0].trim();
+    const { device, os, browser } = parseUA(ua);
+
     await User.findOneAndUpdate(
       { "links.code": code },
       { $inc: { "links.$.clicks": 1 } }
     );
+
     const user = await User.findOne(
       { "links.code": code },
-      { "links.$": 1 }
+      { _id: 1, "links.$": 1 }
     );
+
     originalUrl = user?.links?.[0]?.originalUrl;
+
+    if (user && originalUrl) {
+      Click.create({
+        urlCode: code,
+        userId: user._id,
+        timestamp: new Date(),
+        referrer,
+        device,
+        os,
+        browser,
+        ip,
+      }).catch((err) => console.error("Click record failed:", err));
+    }
   } catch (error) {
     console.error("Short-code redirect failed:", error);
     lookupFailed = true;

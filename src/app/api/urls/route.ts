@@ -181,8 +181,7 @@ export async function DELETE(req: Request) {
     }
 
     const { searchParams } = new URL(req.url);
-    // Changing to delete by code because we removed ids
-    const code = searchParams.get("code") || searchParams.get("id");
+    const code = searchParams.get("code");
 
     if (!code) {
       return NextResponse.json({ error: "URL code is required" }, { status: 400 });

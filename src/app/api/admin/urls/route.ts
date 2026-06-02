@@ -68,7 +68,6 @@ export async function GET(req: Request) {
 
     const formatted = urls.map((url) => ({
       ...url,
-      _id: url.code, // Use code as _id for frontend compatibility
       userId: {
         _id: url.userId.toString(),
         name: url.userName,
@@ -101,7 +100,7 @@ export async function DELETE(req: Request) {
     }
 
     const { searchParams } = new URL(req.url);
-    const code = searchParams.get("id") || searchParams.get("code");
+    const code = searchParams.get("code");
 
     if (!code) {
       return NextResponse.json(
