@@ -340,8 +340,21 @@ export default function AdminPage() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <p className="text-sm text-gray-500">Loading...</p>
+      <div className="animate-pulse space-y-6">
+        <div className="space-y-1">
+          <div className="h-7 w-36 rounded-lg bg-gray-200" />
+          <div className="h-4 w-72 rounded bg-gray-200" />
+        </div>
+        <div className="flex gap-1 rounded-lg border border-gray-200 bg-gray-100 p-1">
+          <div className="h-9 flex-1 rounded-md bg-gray-200" />
+          <div className="h-9 flex-1 rounded-md bg-gray-200" />
+        </div>
+        <div className="h-10 w-full rounded-md bg-gray-200" />
+        <div className="space-y-3">
+          {[0, 1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-16 w-full rounded-lg bg-gray-100" />
+          ))}
+        </div>
       </div>
     );
   }
