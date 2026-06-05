@@ -21,7 +21,6 @@ interface UrlOwner {
 }
 
 interface UrlInfo {
-  _id: string;
   code: string;
   originalUrl: string;
   userId: UrlOwner | string;
@@ -88,65 +87,59 @@ export default function AdminPage() {
 
   // ── Fetch functions ──
 
-  const fetchUsers = useCallback(
-    async (page: number, search: string) => {
-      setUsersLoading(true);
-      try {
-        const params = new URLSearchParams({
-          page: page.toString(),
-          limit: PER_PAGE.toString(),
+  const fetchUsers = useCallback(async (page: number, search: string) => {
+    setUsersLoading(true);
+    try {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: PER_PAGE.toString(),
+      });
+      if (search) params.set("search", search);
+
+      const res = await fetch(`/api/admin/users?${params}`);
+      const data = await res.json();
+      if (res.ok) {
+        setUsers(data.users);
+        setUsersMeta({
+          total: data.total,
+          page: data.page,
+          limit: data.limit,
+          totalPages: data.totalPages,
         });
-        if (search) params.set("search", search);
-
-        const res = await fetch(`/api/admin/users?${params}`);
-        const data = await res.json();
-        if (res.ok) {
-          setUsers(data.users);
-          setUsersMeta({
-            total: data.total,
-            page: data.page,
-            limit: data.limit,
-            totalPages: data.totalPages,
-          });
-        }
-      } catch (err) {
-        console.error("Failed to fetch users:", err);
-      } finally {
-        setUsersLoading(false);
       }
-    },
-    []
-  );
+    } catch (err) {
+      console.error("Failed to fetch users:", err);
+    } finally {
+      setUsersLoading(false);
+    }
+  }, []);
 
-  const fetchUrls = useCallback(
-    async (page: number, search: string) => {
-      setUrlsLoading(true);
-      try {
-        const params = new URLSearchParams({
-          page: page.toString(),
-          limit: PER_PAGE.toString(),
+  const fetchUrls = useCallback(async (page: number, search: string) => {
+    setUrlsLoading(true);
+    try {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: PER_PAGE.toString(),
+      });
+      if (search) params.set("search", search);
+
+      const res = await fetch(`/api/admin/urls?${params}`);
+      const data = await res.json();
+      if (res.ok) {
+        setUrls(data.urls);
+        setUrlsMeta({
+          total: data.total,
+          page: data.page,
+          limit: data.limit,
+          totalPages: data.totalPages,
         });
-        if (search) params.set("search", search);
-
-        const res = await fetch(`/api/admin/urls?${params}`);
-        const data = await res.json();
-        if (res.ok) {
-          setUrls(data.urls);
-          setUrlsMeta({
-            total: data.total,
-            page: data.page,
-            limit: data.limit,
-            totalPages: data.totalPages,
-          });
-        }
-      } catch (err) {
-        console.error("Failed to fetch URLs:", err);
-      } finally {
-        setUrlsLoading(false);
       }
-    },
-    []
-  );
+    } catch (err) {
+      console.error("Failed to fetch URLs:", err);
+    } finally {
+      setUrlsLoading(false);
+    }
+  }, []);
 
   // ── Initial load ──
 
@@ -160,7 +153,7 @@ export default function AdminPage() {
         return;
       }
       Promise.all([fetchUsers(1, ""), fetchUrls(1, "")]).then(() =>
-        setLoading(false)
+        setLoading(false),
       );
     }
   }, [status, session, router, fetchUsers, fetchUrls]);
@@ -262,7 +255,7 @@ export default function AdminPage() {
 
     if (
       !confirm(
-        `Delete user "${userName}" and all their URLs? This cannot be undone.`
+        `Delete user "${userName}" and all their URLs? This cannot be undone.`,
       )
     ) {
       return;
@@ -297,7 +290,7 @@ export default function AdminPage() {
     }
 
     try {
-      const res = await fetch(`/api/admin/urls?id=${urlId}`, {
+      const res = await fetch(`/api/admin/urls?code=${urlId}`, {
         method: "DELETE",
       });
 
@@ -318,7 +311,10 @@ export default function AdminPage() {
 
   // ── Pagination helpers ──
 
-  function getPageNumbers(currentPage: number, totalPages: number): (number | "...")[] {
+  function getPageNumbers(
+    currentPage: number,
+    totalPages: number,
+  ): (number | "...")[] {
     if (totalPages <= 7) {
       return Array.from({ length: totalPages }, (_, i) => i + 1);
     }
@@ -344,8 +340,21 @@ export default function AdminPage() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <p className="text-sm text-gray-500">Loading...</p>
+      <div className="animate-pulse space-y-6">
+        <div className="space-y-1">
+          <div className="h-7 w-36 rounded-lg bg-gray-200" />
+          <div className="h-4 w-72 rounded bg-gray-200" />
+        </div>
+        <div className="flex gap-1 rounded-lg border border-gray-200 bg-gray-100 p-1">
+          <div className="h-9 flex-1 rounded-md bg-gray-200" />
+          <div className="h-9 flex-1 rounded-md bg-gray-200" />
+        </div>
+        <div className="h-10 w-full rounded-md bg-gray-200" />
+        <div className="space-y-3">
+          {[0, 1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-16 w-full rounded-lg bg-gray-100" />
+          ))}
+        </div>
       </div>
     );
   }
@@ -647,7 +656,7 @@ export default function AdminPage() {
 
                 return (
                   <div
-                    key={url._id}
+                    key={url.code}
                     className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-4"
                   >
                     <div className="min-w-0 flex-1">
@@ -659,16 +668,13 @@ export default function AdminPage() {
                       </p>
                       <p className="text-xs text-gray-400">
                         By{" "}
-                        {owner
-                          ? `${owner.name} (${owner.email})`
-                          : "Unknown"}{" "}
-                        &middot;{" "}
-                        {new Date(url.createdAt).toLocaleDateString()}
+                        {owner ? `${owner.name} (${owner.email})` : "Unknown"}{" "}
+                        &middot; {new Date(url.createdAt).toLocaleDateString()}
                       </p>
                     </div>
                     <div className="ml-4">
                       <button
-                        onClick={() => handleDeleteUrl(url._id)}
+                        onClick={() => handleDeleteUrl(url.code)}
                         className="rounded-md border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50"
                       >
                         Delete
@@ -746,7 +752,7 @@ function Pagination({
             >
               {p}
             </button>
-          )
+          ),
         )}
 
         {/* Next */}

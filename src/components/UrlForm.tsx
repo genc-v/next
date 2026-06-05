@@ -91,9 +91,6 @@ export default function UrlForm({ onUrlCreated }: UrlFormProps) {
         )}
       </button>
       
-      <p className="text-xs text-gray-500 text-center">
-        By clicking Shorten Link, you agree to our Terms of Service.
-      </p>
     </form>
   );
 }

@@ -57,6 +57,16 @@ export default function Navbar() {
                 {link.name}
               </Link>
             ))}
+            {session?.user && (
+              <Link
+                href="/dashboard"
+                className={`text-sm font-medium transition-colors hover:text-black ${
+                  pathname.startsWith("/dashboard") ? "text-black" : "text-gray-500"
+                }`}
+              >
+                Dashboard
+              </Link>
+            )}
           </div>
 
           {/* User Actions */}

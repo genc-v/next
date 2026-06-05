@@ -1,86 +1,180 @@
-# Next URL Shortener
+# Shorty — URL Shortener & Analytics
 
-Një aplikacion i plotë për shkurtimin dhe menaxhimin e URL-ve, ndërtuar me **Next.js**, **NextAuth**, **MongoDB** dhe **Tailwind CSS**.
+A full-stack URL shortener built with **Next.js 16**, **NextAuth v5**, **MongoDB**, and **Tailwind CSS v4** for the course *Zhvillim i Ueb-it në Anën e Klientit*.
 
-## Përshkrimi i Projektit
-Ky projekt u zhvillua si detyrë për lëndën "Zhvillim i Ueb-it në Anën e Klientit". Ofron funksionalitete të plota për të:
-- Shkurtuar URL të gjata.
-- Autentifikuar përdorues me Credentials ose Google.
-- Menaxhuar përdoruesit dhe linqet nëpërmjet një Paneli Admini.
-- Ruajtur URL të preferuara për përdoruesit e loguar.
-- Ndërvepruar me forma të validuara dhe UI të përshtatshëm (Responsive Design).
+## Live Demo
 
-## Linku i Aplikacionit Live
-Aplikacioni është hostuar në Vercel:
-[https://your-vercel-deployment-link.vercel.app](https://your-vercel-deployment-link.vercel.app)
+Hosted on Vercel: [https://your-vercel-deployment-link.vercel.app](https://your-vercel-deployment-link.vercel.app)
 
-*(Shënim: Linku do të ofrohet pas deployment përfundimtar në Vercel)*
+> Update this link after the final Vercel deployment.
 
-## Anëtarët e Grupit
-1. **[Emri i Studentit 1]** - Zhvillimi i modeleve të databazës, Autentifikimi (NextAuth), dhe CRUD i Përdoruesve.
-2. **[Emri i Studentit 2]** - UI/UX me Tailwind CSS, Formularët me Validim, dhe Faqet Statike (SSR/SSG/ISR).
-3. **[Emri i Studentit 3]** - Custom Hooks, Konfigurimi i Testeve me Jest, dhe Integrimi i API-ve.
+---
 
-## Udhëzime Instalimi
-Për ta ekzekutuar këtë projekt në lokalin tuaj, ndiqni këto hapa:
+## Features
 
-1. **Klononi repository:**
-   ```bash
-   git clone https://github.com/your-username/next-url-shortener.git
-   cd next-url-shortener
-   ```
+- **URL Shortening** — 7-character alphanumeric codes, collision-safe generation with nanoid
+- **Click Analytics** — every redirect records device type, OS, browser, referrer, and IP
+- **Filterable analytics page** — filter click history by device, OS, browser, and date range
+- **Favorites** — mark and review important links from a dedicated page
+- **Dashboard** — create, copy, delete, and manage all shortened URLs
+- **Profile settings** — update display name and change password
+- **Admin Panel** — search, edit, and delete any user or link platform-wide with pagination
+- **Authentication** — credentials (bcrypt) + Google OAuth via NextAuth v5
+- **Role-based middleware** — protects all authenticated routes, redirects non-admins away from admin panel
+- **Contact form** — validated with React Hook Form, stored in MongoDB
 
-2. **Instaloni dependencat:**
-   ```bash
-   npm install
-   ```
+---
 
-3. **Konfiguroni Variablat e Mjedisit:**
-   Krijoni një skedar `.env.local` në root të projektit me vlerat e mëposhtme:
-   ```env
-   MONGODB_URI=your_mongodb_connection_string
-   AUTH_SECRET=your_nextauth_secret
-   GOOGLE_CLIENT_ID=your_google_client_id
-   GOOGLE_CLIENT_SECRET=your_google_client_secret
-   NEXT_PUBLIC_APP_URL=http://localhost:3000
-   ```
+## Pages
 
-4. **Ekzekutoni Serverin e Zhvillimit:**
-   ```bash
-   npm run dev
-   ```
-   Hapni [http://localhost:3000](http://localhost:3000) në shfletuesin tuaj për të parë rezultatin.
+| Route | Description | Auth |
+|---|---|---|
+| `/` | Home — landing page with features and how-it-works | Public |
+| `/about` | About — tech stack, highlights, user/admin capabilities | Public |
+| `/contact` | Contact — validated form saved to MongoDB | Public |
+| `/faq` | FAQ — grouped accordion Q&A | Public |
+| `/auth/signin` | Sign in with credentials or Google | Public |
+| `/auth/signup` | Create a new account | Public |
+| `/dashboard` | Create and manage shortened URLs | User |
+| `/profile` | Update name and change password | User |
+| `/favorites` | View favorited URLs | User |
+| `/urls/[code]` | Per-link click analytics with filters | User |
+| `/admin` | Manage all users and URLs platform-wide | Admin |
+| `/[code]` | Short URL redirect — tracks click event | Public |
+| `/_not-found` | 404 page | Public |
 
-5. **Testimi:**
-   Për të rimbajtur testet e krijuara me Jest, përdorni komandën:
-   ```bash
-   npm run test
-   ```
+---
 
-## Teknologjitë e Përdorura
-- **Frontend:** React 19, Next.js 16 (App & Pages Router)
-- **Stilizim:** Tailwind CSS
-- **Backend:** Next.js API Routes
-- **Database:** MongoDB & Mongoose
-- **Autentifikim:** NextAuth.js
-- **Forma & Validime:** React Hook Form
-- **Testim:** Jest & React Testing Library
+## Tech Stack
 
-## Faqet Kryesore
-- `/` Home
-- `/about` About
-- `/contact` Contact form
-- `/auth/signin` dhe `/auth/signup`
-- `/dashboard` Dashboard për përdorues të loguar
-- `/admin` Admin Panel vetëm për admin
-- `/profile` Profile me përditësim të emrit
-- `/favorites` Favorites për përdorues të loguar
-- `/faq` faqe bonus
+| Technology | Version | Usage |
+|---|---|---|
+| Next.js | 16 | App Router, Server Components, API Routes, Middleware |
+| React | 19 | UI, client components, hooks |
+| MongoDB + Mongoose | 9 | Data persistence, 3 models |
+| NextAuth | v5 beta | JWT sessions, Google OAuth, credentials |
+| Tailwind CSS | v4 | Utility-first styling, responsive design |
+| React Hook Form | 7 | Form validation on contact, profile, and auth pages |
+| bcryptjs | 3 | Password hashing (cost 12) |
+| nanoid | 3 | Short code generation |
+| TypeScript | 5 | Full type safety across the codebase |
+| Jest + RTL | 30 / 16 | Unit and component tests |
 
-## Verifikim Lokal
-```bash
-npm run lint
-npx tsc --noEmit
-npm test -- --runInBand
-npm run build
+---
+
+## MongoDB Models
+
+**`User`** — stores account info and embedded shortened links
 ```
+name, email, hashedPassword, image, role (user|admin), links[]
+  links: { code, originalUrl, clicks, favorite, createdAt, updatedAt }
+```
+
+**`Click`** — one document per redirect event, indexed by `urlCode`
+```
+urlCode, userId, timestamp, device, os, browser, referrer, ip
+```
+
+**`ContactMessage`** — contact form submissions
+```
+name, email, message, createdAt
+```
+
+---
+
+## Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/your-username/next-url-shortener.git
+cd next-url-shortener
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Configure environment variables
+
+Create a `.env.local` file in the project root:
+
+```env
+MONGODB_URI=your_mongodb_connection_string
+AUTH_SECRET=your_nextauth_secret_32_chars_min
+GOOGLE_CLIENT_ID=your_google_oauth_client_id
+GOOGLE_CLIENT_SECRET=your_google_oauth_client_secret
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+### 4. Seed an admin account
+
+```bash
+npm run seed:admin
+```
+
+### 5. Run the development server
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+---
+
+## Available Scripts
+
+```bash
+npm run dev        # Start development server
+npm run build      # Production build
+npm run start      # Start production server
+npm run lint       # Run ESLint
+npm test           # Run all tests
+npm run seed:admin # Create initial admin user
+```
+
+---
+
+## Tests
+
+Run the full test suite:
+
+```bash
+npm test -- --runInBand
+```
+
+| Suite | File | Tests |
+|---|---|---|
+| Button component | `__tests__/components/Button.test.tsx` | 3 |
+| Card component | `__tests__/components/Card.test.tsx` | 1 |
+| Footer component | `__tests__/components/Footer.test.tsx` | 1 |
+| UrlList component | `__tests__/components/UrlList.test.tsx` | 5 |
+| UrlForm component | `__tests__/components/UrlForm.test.tsx` | 4 |
+| Contact API logic | `__tests__/api/contact.test.ts` | 2 |
+| URL API logic | `__tests__/api/urls.test.ts` | 6 |
+| Register API logic | `__tests__/api/register.test.ts` | 3 |
+| Utility functions | `__tests__/utils/utils.test.ts` | 15 |
+
+**40 tests total across 9 suites.**
+
+---
+
+## Vercel Deployment
+
+1. Push the repository to GitHub
+2. Import the project in [Vercel](https://vercel.com)
+3. Add all `.env.local` variables in **Settings → Environment Variables**
+4. Deploy — Vercel runs `npm run build` automatically
+
+---
+
+## Group Members
+
+| Name | Contributions |
+|---|---|
+| [Student 1] | Database models, NextAuth authentication, CRUD API routes |
+| [Student 2] | UI/UX with Tailwind, forms with React Hook Form, static pages |
+| [Student 3] | Custom hooks, click analytics, admin panel, Jest tests |

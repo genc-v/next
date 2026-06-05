@@ -37,8 +37,9 @@ export default {
       const isOnProfile = nextUrl.pathname.startsWith("/profile");
       const isOnFavorites = nextUrl.pathname.startsWith("/favorites");
       const isOnAdmin = nextUrl.pathname.startsWith("/admin");
+      const isOnUrls = nextUrl.pathname.startsWith("/urls");
 
-      if ((isOnDashboard || isOnProfile || isOnFavorites || isOnAdmin) && !isLoggedIn) {
+      if ((isOnDashboard || isOnProfile || isOnFavorites || isOnAdmin || isOnUrls) && !isLoggedIn) {
         return false; // Redirect to sign-in
       }
 
