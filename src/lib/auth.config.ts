@@ -40,10 +40,9 @@ export default {
       const isOnUrls = nextUrl.pathname.startsWith("/urls");
 
       if ((isOnDashboard || isOnProfile || isOnFavorites || isOnAdmin || isOnUrls) && !isLoggedIn) {
-        return false; // Redirect to sign-in
+        return false;
       }
 
-      // Admin pages require admin role
       if (isOnAdmin && auth?.user?.role !== "admin") {
         return Response.redirect(new URL("/dashboard", nextUrl));
       }

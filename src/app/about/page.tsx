@@ -87,7 +87,6 @@ const highlights = [
 export default function AboutPage() {
   return (
     <div className="mx-auto max-w-5xl space-y-16 pb-16">
-      {/* Hero */}
       <section className="pt-6">
         <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
           About the project
@@ -102,7 +101,6 @@ export default function AboutPage() {
         </p>
       </section>
 
-      {/* Tech Stack */}
       <section>
         <h2 className="mb-6 text-2xl font-bold text-gray-900">Tech stack</h2>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -118,7 +116,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Technical Highlights */}
       <section>
         <h2 className="mb-6 text-2xl font-bold text-gray-900">
           Technical highlights
@@ -144,7 +141,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* User vs Admin */}
       <section>
         <h2 className="mb-6 text-2xl font-bold text-gray-900">
           What you can do

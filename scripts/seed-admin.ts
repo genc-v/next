@@ -21,7 +21,6 @@ import bcrypt from "bcryptjs";
 import { config } from "dotenv";
 import { resolve } from "path";
 
-// Load .env.local
 config({ path: resolve(process.cwd(), ".env.local") });
 
 const MONGODB_URI = process.env.MONGODB_URI;
@@ -52,7 +51,6 @@ async function main() {
   const targetEmail = process.argv[2];
 
   if (targetEmail) {
-    // Promote existing user to admin
     const user = await User.findOne({ email: targetEmail.toLowerCase() });
     if (!user) {
       console.error(`User with email "${targetEmail}" not found.`);
@@ -62,7 +60,6 @@ async function main() {
     await user.save();
     console.log(`User "${user.name}" (${user.email}) has been promoted to admin.`);
   } else {
-    // Create default admin if none exists
     const existingAdmin = await User.findOne({ role: "admin" });
     if (existingAdmin) {
       console.log(`An admin already exists: ${existingAdmin.name} (${existingAdmin.email})`);

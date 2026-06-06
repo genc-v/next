@@ -76,7 +76,6 @@ const groups = [
 export default function FAQPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-12 pb-16">
-      {/* Header */}
       <section className="pt-6">
         <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
           Help center
@@ -90,7 +89,6 @@ export default function FAQPage() {
         </p>
       </section>
 
-      {/* Groups */}
       {groups.map((group) => (
         <section key={group.category}>
           <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-400">

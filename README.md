@@ -2,37 +2,31 @@
 
 A full-stack URL shortener built with **Next.js 16**, **NextAuth v5**, **MongoDB**, and **Tailwind CSS v4** for the course *Zhvillim i Ueb-it në Anën e Klientit*.
 
-## Live Demo
-
-Hosted on Vercel: [https://your-vercel-deployment-link.vercel.app](https://your-vercel-deployment-link.vercel.app)
-
-> Update this link after the final Vercel deployment.
-
 ---
 
 ## Features
 
-- **URL Shortening** — 7-character alphanumeric codes, collision-safe generation with nanoid
+- **URL Shortening** — 7-character alphanumeric codes generated with nanoid, collision-safe
 - **Click Analytics** — every redirect records device type, OS, browser, referrer, and IP
-- **Filterable analytics page** — filter click history by device, OS, browser, and date range
+- **Filterable Analytics** — filter click history by device, OS, browser, and date range
 - **Favorites** — mark and review important links from a dedicated page
-- **Dashboard** — create, copy, delete, and manage all shortened URLs
-- **Profile settings** — update display name and change password
-- **Admin Panel** — search, edit, and delete any user or link platform-wide with pagination
-- **Authentication** — credentials (bcrypt) + Google OAuth via NextAuth v5
-- **Role-based middleware** — protects all authenticated routes, redirects non-admins away from admin panel
-- **Contact form** — validated with React Hook Form, stored in MongoDB
+- **Dashboard** — create, copy, delete, and manage all shortened URLs with pagination
+- **Profile Settings** — update display name and change password
+- **Admin Panel** — search, edit, and delete any user or link platform-wide
+- **Authentication** — email/password (bcrypt) + Google OAuth via NextAuth v5
+- **Role-based Middleware** — protects authenticated routes, redirects non-admins from admin panel
+- **Contact Form** — validated with React Hook Form, stored in MongoDB
 
 ---
 
 ## Pages
 
-| Route | Description | Auth |
+| Route | Description | Access |
 |---|---|---|
-| `/` | Home — landing page with features and how-it-works | Public |
-| `/about` | About — tech stack, highlights, user/admin capabilities | Public |
-| `/contact` | Contact — validated form saved to MongoDB | Public |
-| `/faq` | FAQ — grouped accordion Q&A | Public |
+| `/` | Landing page with features and how-it-works | Public |
+| `/about` | Tech stack, highlights, user/admin capabilities | Public |
+| `/contact` | Validated contact form saved to MongoDB | Public |
+| `/faq` | Grouped accordion Q&A | Public |
 | `/auth/signin` | Sign in with credentials or Google | Public |
 | `/auth/signup` | Create a new account | Public |
 | `/dashboard` | Create and manage shortened URLs | User |
@@ -41,7 +35,6 @@ Hosted on Vercel: [https://your-vercel-deployment-link.vercel.app](https://your-
 | `/urls/[code]` | Per-link click analytics with filters | User |
 | `/admin` | Manage all users and URLs platform-wide | Admin |
 | `/[code]` | Short URL redirect — tracks click event | Public |
-| `/_not-found` | 404 page | Public |
 
 ---
 
@@ -58,7 +51,7 @@ Hosted on Vercel: [https://your-vercel-deployment-link.vercel.app](https://your-
 | bcryptjs | 3 | Password hashing (cost 12) |
 | nanoid | 3 | Short code generation |
 | TypeScript | 5 | Full type safety across the codebase |
-| Jest + RTL | 30 / 16 | Unit and component tests |
+| Jest + Testing Library | 30 / 16 | Unit and component tests |
 
 ---
 
@@ -87,8 +80,8 @@ name, email, message, createdAt
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/next-url-shortener.git
-cd next-url-shortener
+git clone https://github.com/genc-v/next.git
+cd next
 ```
 
 ### 2. Install dependencies
@@ -109,13 +102,21 @@ GOOGLE_CLIENT_SECRET=your_google_oauth_client_secret
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-### 4. Seed an admin account
+### 4. Start MongoDB (Docker)
+
+```bash
+docker-compose up -d
+```
+
+### 5. Seed an admin account
 
 ```bash
 npm run seed:admin
 ```
 
-### 5. Run the development server
+Default credentials: `admin@shorty.local` / `admin123`
+
+### 6. Run the development server
 
 ```bash
 npm run dev
@@ -133,48 +134,30 @@ npm run build      # Production build
 npm run start      # Start production server
 npm run lint       # Run ESLint
 npm test           # Run all tests
-npm run seed:admin # Create initial admin user
+npm run seed:admin # Create or promote an admin user
 ```
 
 ---
 
 ## Tests
 
-Run the full test suite:
-
 ```bash
-npm test -- --runInBand
+npm test
 ```
 
-| Suite | File | Tests |
-|---|---|---|
-| Button component | `__tests__/components/Button.test.tsx` | 3 |
-| Card component | `__tests__/components/Card.test.tsx` | 1 |
-| Footer component | `__tests__/components/Footer.test.tsx` | 1 |
-| UrlList component | `__tests__/components/UrlList.test.tsx` | 5 |
-| UrlForm component | `__tests__/components/UrlForm.test.tsx` | 4 |
-| Contact API logic | `__tests__/api/contact.test.ts` | 2 |
-| URL API logic | `__tests__/api/urls.test.ts` | 6 |
-| Register API logic | `__tests__/api/register.test.ts` | 3 |
-| Utility functions | `__tests__/utils/utils.test.ts` | 15 |
-
-**40 tests total across 9 suites.**
-
----
-
-## Vercel Deployment
-
-1. Push the repository to GitHub
-2. Import the project in [Vercel](https://vercel.com)
-3. Add all `.env.local` variables in **Settings → Environment Variables**
-4. Deploy — Vercel runs `npm run build` automatically
-
----
-
-## Group Members
-
-| Name | Contributions |
+| Suite | Coverage |
 |---|---|
-| [Student 1] | Database models, NextAuth authentication, CRUD API routes |
-| [Student 2] | UI/UX with Tailwind, forms with React Hook Form, static pages |
-| [Student 3] | Custom hooks, click analytics, admin panel, Jest tests |
+| Utility functions | `isValidUrl`, `generateShortCode`, `parseUA` |
+| Button component | Renders, variants |
+
+---
+
+## Contributors
+
+| Contributor | Responsibilities |
+|---|---|
+| Contributor 1 | Authentication system — NextAuth v5 setup, Google OAuth, credentials provider, JWT sessions, role-based middleware |
+| Contributor 2 | Database layer — MongoDB models (User, Click, ContactMessage), Mongoose schemas, database connection and seeding |
+| Contributor 3 | Core API routes — URL shortening, CRUD operations, click tracking, profile and contact endpoints |
+| Contributor 4 | Admin panel — user and URL management, search, pagination, admin-only access control |
+| Contributor 5 | Frontend & UI — dashboard, analytics page, favorites, profile settings, loading skeletons, responsive Tailwind styling |

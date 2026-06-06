@@ -4,7 +4,6 @@ import dbConnect from "@/lib/db";
 import User from "@/models/User";
 import { generateShortCode, isValidUrl } from "@/lib/utils";
 
-// GET /api/urls — fetch URLs for the logged-in user (paginated)
 export async function GET(req: Request) {
   try {
     const session = await auth();
@@ -25,7 +24,6 @@ export async function GET(req: Request) {
     const limit = Math.min(50, Math.max(1, parseInt(searchParams.get("limit") || "10", 10)));
     const skip = (page - 1) * limit;
 
-    // Sort by creation date (newest first), then paginate
     const sortedLinks = [...user.links]
       .filter((link) => !favoriteOnly || link.favorite)
       .sort((a, b) => {
@@ -72,7 +70,6 @@ export async function GET(req: Request) {
   }
 }
 
-// POST /api/urls — create a new shortened URL
 export async function POST(req: Request) {
   try {
     const session = await auth();
@@ -91,7 +88,6 @@ export async function POST(req: Request) {
 
     await dbConnect();
 
-    // Generate a unique 6-character code
     let code = "";
     let exists = true;
     while (exists) {
@@ -144,7 +140,6 @@ export async function POST(req: Request) {
   }
 }
 
-// PATCH /api/urls — update a specific URL by code for the logged-in user
 export async function PATCH(req: Request) {
   try {
     const session = await auth();
@@ -200,7 +195,6 @@ export async function PATCH(req: Request) {
   }
 }
 
-// DELETE /api/urls?code=xxx — delete a specific URL by code for the logged-in user
 export async function DELETE(req: Request) {
   try {
     const session = await auth();
