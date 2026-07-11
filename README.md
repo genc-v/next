@@ -171,10 +171,25 @@ npm test -- --runInBand
 
 ---
 
+## Screenshots
+
+**Home**
+![Home](assets/Screenshot%202026-07-11%20at%2010.23.19.png)
+
+**Dashboard**
+![Dashboard](assets/Screenshot%202026-07-11%20at%2010.23.03.png)
+
+**Link Analytics**
+![Link Analytics](assets/Screenshot%202026-07-11%20at%2010.23.38.png)
+
+---
+
 ## Group Members
 
-| Name | Contributions |
-|---|---|
-| [Student 1] | Database models, NextAuth authentication, CRUD API routes |
-| [Student 2] | UI/UX with Tailwind, forms with React Hook Form, static pages |
-| [Student 3] | Custom hooks, click analytics, admin panel, Jest tests |
+| # | Name | Email |
+|---|---|---|
+| 1 | Genc Vllahiu | gv71594@ubt-uni.net |
+| 2 | Orgest Pasha | op70470@ubt-uni.net |
+| 3 | Jon Fejzullahu | jf70240@ubt-uni.net |
+| 4 | Auron Ismaili | ai73075@ubt-uni.net |
+| 5 | Jon Ramadani | jr70703@ubt-uni.net |

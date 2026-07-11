@@ -1,3 +1,5 @@
+export const dynamic = "force-static"; // SSG — built once at build time
+
 import { Link2, BarChart3, Shield, LockKeyhole, Database, MousePointerClick } from "lucide-react";
 
 const stack = [

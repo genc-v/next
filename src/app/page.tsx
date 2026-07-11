@@ -1,3 +1,5 @@
+export const revalidate = 300; // ISR — regenerate every 5 minutes
+
 import Link from "next/link";
 import {
   Link2,
