@@ -4,7 +4,7 @@ A full-stack URL shortener built with **Next.js 16**, **NextAuth v5**, **MongoDB
 
 ## Live Demo
 
-Hosted on Vercel: [https://your-vercel-deployment-link.vercel.app](https://your-vercel-deployment-link.vercel.app)
+Hosted on Vercel: [https://next-lilac-sigma-72.vercel.app/](https://next-lilac-sigma-72.vercel.app/)
 
 > Update this link after the final Vercel deployment.
 
